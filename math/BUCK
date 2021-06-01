@@ -1,0 +1,14 @@
+cxx_library(
+  name = 'math',
+  exported_headers = glob([
+      "*.h",
+  ]),
+  srcs = glob([
+    '*.cpp',
+  ]),
+  visibility = [
+      'PUBLIC',
+  ],
+  deps = [
+  ],
+)

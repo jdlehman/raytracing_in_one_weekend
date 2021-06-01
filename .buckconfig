@@ -1,0 +1,5 @@
+[cxx]
+  cxxflags = -Wall -std=c++1z
+
+[parser]
+  default_build_file_syntax = skylark
