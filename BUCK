@@ -5,5 +5,6 @@ cxx_binary(
   ]),
   deps = [
       "//math:math",
+      "//graphics:graphics",
   ],
 )

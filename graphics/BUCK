@@ -1,0 +1,15 @@
+cxx_library(
+  name = 'graphics',
+  exported_headers = glob([
+      "*.h",
+  ]),
+  srcs = glob([
+    '*.cpp',
+  ]),
+  visibility = [
+      'PUBLIC',
+  ],
+  deps = [
+      "//math:math"
+  ],
+)
