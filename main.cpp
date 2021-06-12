@@ -40,9 +40,9 @@ int main() {
   // World
   hittableList world;
   std::shared_ptr<lambertian> materialGround = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
-  std::shared_ptr<lambertian> materialCenter = std::make_shared<lambertian>(color(0.7, 0.3, 0.3));
-  std::shared_ptr<metal> materialLeft = std::make_shared<metal>(color(0.8, 0.8, 0.8), 0.3);
-  std::shared_ptr<metal> materialRight = std::make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+  std::shared_ptr<lambertian> materialCenter = std::make_shared<lambertian>(color(0.1, 0.2, 0.5));
+  std::shared_ptr<dielectric> materialLeft = std::make_shared<dielectric>(1.5);
+  std::shared_ptr<metal> materialRight = std::make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
 
   world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround));
   world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter));

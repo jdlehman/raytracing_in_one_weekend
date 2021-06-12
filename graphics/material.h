@@ -52,5 +52,34 @@ class metal : public material {
     double fuzz;
 };
 
+class dielectric : public material {
+  public:
+    virtual ~dielectric() {}
+    dielectric(double indexOfRefraction) : indexOfRefraction(indexOfRefraction) {}
+
+    virtual bool scatter(const ray& rayIn, const hitRecord& hitRec, color& attenuation, ray& scattered) const override {
+      attenuation = color(1.0, 1.0, 1.0);
+      double refractionRatio = hitRec.frontFace ? (1.0 / indexOfRefraction) : indexOfRefraction;
+
+      vec3 unitDirection = unitVector(rayIn.direction());
+      double cosTheta = fmin(dot(-unitDirection, hitRec.normal), 1.0);
+      double sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+      bool cannotRefract = refractionRatio * sinTheta > 1.0;
+      vec3 direction;
+      if (cannotRefract) {
+        direction = reflect(unitDirection, hitRec.normal);
+      } else {
+        direction = refract(unitDirection, hitRec.normal, refractionRatio);
+      }
+
+      scattered = ray(hitRec.p, direction);
+      return true;
+    }
+
+  public:
+    double indexOfRefraction;
+};
+
 
 #endif

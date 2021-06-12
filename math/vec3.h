@@ -130,8 +130,16 @@ vec3 randomUnitVector() {
   return unitVector(randomInUnitSphere());
 }
 
-vec3 reflect(const vec3& v, const vec3& n) {
-  return v - 2 * dot(v, n) * n;
+vec3 reflect(const vec3& v, const vec3& normal) {
+  return v - 2 * dot(v, normal) * normal;
+}
+
+// using snells law
+vec3 refract(const vec3& uv, const vec3& normal, double etaiOverEtat) {
+  auto cosTheta = fmin(dot(-uv, normal), 1.0);
+  vec3 rOutPerp =  etaiOverEtat * (uv + cosTheta * normal);
+  vec3 rOutParallel = -sqrt(fabs(1.0 - rOutPerp.lengthSquared())) * normal;
+  return rOutPerp + rOutParallel;
 }
 
 #endif
