@@ -14,7 +14,7 @@ color rayColor(const ray& r, const hittable& world, int remainingRayBounces) {
   if (remainingRayBounces <= 0) {
     return color(0, 0, 0);
   }
-  if (world.hit(r, 0, INF, rec)) {
+  if (world.hit(r, 0.001, INF, rec)) {
     point3 target = rec.p + rec.normal + randomInUnitSphere();
     return 0.5 * rayColor(ray(rec.p, target - rec.p), world, remainingRayBounces - 1);
   }
