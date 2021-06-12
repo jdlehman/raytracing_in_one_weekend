@@ -2,8 +2,8 @@
 #define COLOR_H
 #pragma once
 
-#include "vec3.h"
-#include "utils.h"
+#include <math/vec3.h>
+#include <math/utils.h>
 
 #include <iostream>
 

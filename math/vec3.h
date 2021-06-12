@@ -5,6 +5,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "utils.h"
+
 class vec3 {
   public:
     vec3() : e{0,0,0} {}

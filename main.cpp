@@ -1,10 +1,10 @@
 #include <iostream>
 
+#include <math/ray.h>
 #include <math/utils.h>
 #include <math/vec3.h>
-#include <math/color.h>
-#include <math/ray.h>
 #include <graphics/camera.h>
+#include <graphics/color.h>
 #include <graphics/hittableList.h>
 #include <graphics/sphere.h>
 
