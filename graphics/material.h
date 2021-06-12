@@ -38,17 +38,18 @@ class lambertian : public material {
 class metal : public material {
   public:
     virtual ~metal() {}
-    metal(const color& a) : albedo(a) {}
+    metal(const color& a, double f) : albedo(a), fuzz(f < 1.0 ? f : 1.0) {}
 
     virtual bool scatter(const ray &rayIn, const hitRecord& hitRec, color& attenuation, ray& scattered) const override {
       vec3 reflected = reflect(unitVector(rayIn.direction()), hitRec.normal);
-      scattered = ray(hitRec.p, reflected);
+      scattered = ray(hitRec.p, reflected + fuzz * randomInUnitSphere());
       attenuation = albedo;
       return dot(scattered.direction(), hitRec.normal) > 0;
     }
 
   public:
     color albedo;
+    double fuzz;
 };
 
 
