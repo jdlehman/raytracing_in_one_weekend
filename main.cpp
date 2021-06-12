@@ -7,6 +7,7 @@
 #include <graphics/color.h>
 #include <graphics/hittableList.h>
 #include <graphics/sphere.h>
+#include <graphics/material.h>
 
 color rayColor(const ray& r, const hittable& world, int remainingRayBounces) {
   hitRecord rec;
@@ -15,8 +16,12 @@ color rayColor(const ray& r, const hittable& world, int remainingRayBounces) {
     return color(0, 0, 0);
   }
   if (world.hit(r, 0.001, INF, rec)) {
-    point3 target = rec.p + rec.normal + randomUnitVector();
-    return 0.5 * rayColor(ray(rec.p, target - rec.p), world, remainingRayBounces - 1);
+    ray scattered;
+    color attenuation;
+    if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+      return attenuation * rayColor(scattered, world, remainingRayBounces - 1);
+    }
+    return color(0, 0, 0);
   }
 
   vec3 unitDirection = unitVector(r.direction());
@@ -34,8 +39,15 @@ int main() {
 
   // World
   hittableList world;
-  world.add(std::make_shared<sphere>(point3(0, 0, -1), 0.5));
-  world.add(std::make_shared<sphere>(point3(0, -100.5, -1), 100));
+  std::shared_ptr<lambertian> materialGround = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
+  std::shared_ptr<lambertian> materialCenter = std::make_shared<lambertian>(color(0.7, 0.3, 0.3));
+  std::shared_ptr<metal> materialLeft = std::make_shared<metal>(color(0.8, 0.8, 0.8));
+  std::shared_ptr<metal> materialRight = std::make_shared<metal>(color(0.8, 0.6, 0.2));
+
+  world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround));
+  world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter));
+  world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, materialLeft));
+  world.add(std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, materialRight));
 
   // Camera
   camera cam;
