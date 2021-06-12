@@ -118,4 +118,8 @@ vec3 randomInUnitSphere() {
   }
 }
 
+vec3 randomUnitVector() {
+  return unitVector(randomInUnitSphere());
+}
+
 #endif
