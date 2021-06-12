@@ -48,6 +48,14 @@ class vec3 {
       return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
 
+    inline static vec3 random() {
+      return vec3(randomDouble(), randomDouble(), randomDouble());
+    }
+
+    inline static vec3 random(double min, double max) {
+      return vec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
+    }
+
   public:
     double e[3];
 };
@@ -99,6 +107,15 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 unitVector(vec3 v) {
     return v / v.length();
+}
+
+vec3 randomInUnitSphere() {
+  while(true) {
+    vec3 p = vec3::random(-1, 1);
+    // continue if p is outside or on the unit sphere
+    if (p.lengthSquared() >= 1) continue;
+    return p;
+  }
 }
 
 #endif

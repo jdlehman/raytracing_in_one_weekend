@@ -8,10 +8,15 @@
 #include <graphics/hittableList.h>
 #include <graphics/sphere.h>
 
-color rayColor(const ray& r, const hittable& world) {
+color rayColor(const ray& r, const hittable& world, int remainingRayBounces) {
   hitRecord rec;
+  // no more light is gathered once passing the ray bounce limit
+  if (remainingRayBounces <= 0) {
+    return color(0, 0, 0);
+  }
   if (world.hit(r, 0, INF, rec)) {
-    return 0.5 * (rec.normal + color(1, 1, 1));
+    point3 target = rec.p + rec.normal + randomInUnitSphere();
+    return 0.5 * rayColor(ray(rec.p, target - rec.p), world, remainingRayBounces - 1);
   }
 
   vec3 unitDirection = unitVector(r.direction());
@@ -25,6 +30,7 @@ int main() {
   const int imageWidth = 400;
   const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
   const int samplesPerPixel = 100;
+  const int maxRayBounces = 50;
 
   // World
   hittableList world;
@@ -45,7 +51,7 @@ int main() {
         const double u = double(j + randomDouble()) / (imageWidth - 1);
         const double v = double(i + randomDouble()) / (imageHeight - 1);
         const ray r = cam.getRay(u, v);
-        pixelColor += rayColor(r, world);
+        pixelColor += rayColor(r, world, maxRayBounces);
       }
       writeColor(std::cout, pixelColor, samplesPerPixel);
     }
