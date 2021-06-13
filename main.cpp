@@ -29,29 +29,68 @@ color rayColor(const ray& r, const hittable& world, int remainingRayBounces) {
   return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 
+hittableList randomScene() {
+  hittableList world;
+  auto groundMaterial = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
+  world.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, groundMaterial));
+
+  for (int a = -11; a < 11; a++) {
+    for (int b = -11; b < 11; b++) {
+      auto chooseMat = randomDouble();
+      point3 center(a + 0.9 * randomDouble(), 0.2, b + 0.9 * randomDouble());
+
+      if ((center - point3(4, 0.2, 0)).length() > 0.9) {
+        std::shared_ptr<material> sphereMaterial;
+
+        if (chooseMat < 0.8) {
+          // diffuse
+          const color albedo = color::random() * color::random();
+          sphereMaterial = std::make_shared<lambertian>(albedo);
+        } else if (chooseMat < 0.95) {
+          //metal
+          const color albedo = color::random(0.5, 1);
+          const double fuzz = randomDouble(0, 0.5);
+          sphereMaterial = std::make_shared<metal>(albedo, fuzz);
+        } else {
+          // glass
+          sphereMaterial = std::make_shared<dielectric>(1.5);
+        }
+        world.add(std::make_shared<sphere>(center, 0.2, sphereMaterial));
+      }
+    }
+  }
+
+  auto glassMaterial = std::make_shared<dielectric>(1.5);
+  world.add(std::make_shared<sphere>(point3(0, 1, 0), 1.0, glassMaterial));
+
+  auto diffuseMaterial = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
+  world.add(std::make_shared<sphere>(point3(-4, 1, 0), 1.0, diffuseMaterial));
+
+  auto metalMaterial = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+  world.add(std::make_shared<sphere>(point3(4, 1, 0), 1.0, metalMaterial));
+
+  return world;
+}
+
 int main() {
   // Image
-  const double aspectRatio = 16.0 / 9.0;
-  const int imageWidth = 400;
+  const double aspectRatio = 3.0 / 2.0;
+  const int imageWidth = 1200;
   const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
   const int samplesPerPixel = 100;
   const int maxRayBounces = 50;
 
   // World
-  hittableList world;
-  std::shared_ptr<lambertian> materialGround = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
-  std::shared_ptr<lambertian> materialCenter = std::make_shared<lambertian>(color(0.1, 0.2, 0.5));
-  std::shared_ptr<dielectric> materialLeft = std::make_shared<dielectric>(1.5);
-  std::shared_ptr<metal> materialRight = std::make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
-
-  world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround));
-  world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter));
-  world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, materialLeft));
-  world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.4, materialLeft));
-  world.add(std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, materialRight));
+  hittableList world = randomScene();
 
   // Camera
-  camera cam;
+  const point3 position(13, 2, 3);
+  const point3 focalPoint(0, 0, 0);
+  const vec3 cameraUp(0, 1, 0);
+  const double distToFocus = 10.0;
+  const double aperture = 0.1;
+  const double vFov = 20.0;
+  camera cam(position, focalPoint, cameraUp, vFov, aspectRatio, aperture, distToFocus);
 
   // Render
   std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
@@ -71,4 +110,5 @@ int main() {
   }
 
   std::cerr << "\nDone.\n";
+  return 0;
 }

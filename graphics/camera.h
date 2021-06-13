@@ -8,20 +8,35 @@
 
 class camera {
   public:
-    camera() {
-      const double aspectRatio = 16.0 / 9.0;
-      const double viewportHeight = 2.0;
+    camera(
+        point3 position,
+        point3 focalPoint,
+        vec3 cameraUp,
+        double vFovDegrees,
+        double aspectRatio,
+        double aperture,
+        double focusDist) {
+      const double vFovRadians = degreesToRadians(vFovDegrees);
+      const double h = tan(vFovRadians / 2);
+      const double viewportHeight = 2.0 * h;
       const double viewportWidth = aspectRatio * viewportHeight;
-      const double focalLength = 1.0;
 
-      origin = point3(0, 0, 0);
-      horizontal = vec3(viewportWidth, 0.0, 0.0);
-      vertical = vec3(0.0, viewportHeight, 0.0);
-      lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - vec3(0, 0, focalLength);
+      w = unitVector(position - focalPoint);
+      u = unitVector(cross(cameraUp, w));
+      vec3 v = cross(w, u);
+
+      origin = position;
+      horizontal = focusDist * viewportWidth * u;
+      vertical = focusDist * viewportHeight * v;
+      lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - focusDist * w;
+
+      lensRadius = aperture / 2;
     }
 
-    ray getRay(double u, double v) const {
-      return ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+    ray getRay(double s, double t) const {
+      const vec3 rd = lensRadius * randomInUnitDisk();
+      const vec3 offset = u * rd.x() + v * rd.y();
+      return ray(origin + offset, lowerLeftCorner + s * horizontal + t * vertical - origin - offset);
     }
 
   private:
@@ -29,6 +44,8 @@ class camera {
     point3 lowerLeftCorner;
     vec3 horizontal;
     vec3 vertical;
+    vec3 u, v, w;
+    double lensRadius;
 };
 
 #endif

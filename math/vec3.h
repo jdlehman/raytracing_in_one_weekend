@@ -126,6 +126,14 @@ vec3 randomInUnitSphere() {
   }
 }
 
+vec3 randomInUnitDisk() {
+  while(true) {
+    vec3 p = vec3(randomDouble(-1, 1), randomDouble(-1, 1), 0);
+    if (p.lengthSquared() >= 1) continue;
+    return p;
+  }
+}
+
 vec3 randomUnitVector() {
   return unitVector(randomInUnitSphere());
 }
